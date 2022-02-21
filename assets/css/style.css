@@ -1,0 +1,20 @@
+/* * {
+    margin-left: 20px;
+    margin-right: 20px;
+} */
+
+#topInfo{
+    display: flex;
+    height: 80px;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 100px;
+    margin-left: 60px;
+    margin-right: 60px;
+}
+
+#quizQuestion{
+    align-content: center;
+    background-color: aquamarine;
+    
+}
