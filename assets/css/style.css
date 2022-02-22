@@ -4,6 +4,8 @@
 
 :root{
     --primary: #2d2275;
+    --secondary: #177648;
+    --tertiary: #75170b;
 }
 
 #topInfo{
@@ -35,4 +37,12 @@
     padding: 15px 30px;
     font-size: 16px;
     margin-top: 25px;
+}
+
+.startBtn:hover {
+    background: var(--secondary);
+}
+
+.highScore:hover {
+    color: var(--tertiary);
 }
