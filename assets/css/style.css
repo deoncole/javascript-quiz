@@ -43,6 +43,6 @@
     background: var(--secondary);
 }
 
-.highScore:hover {
-    color: var(--tertiary);
+.choicesList:hover{
+    background-color: #177648;
 }

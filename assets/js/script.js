@@ -28,7 +28,7 @@ quizTimeEl.textContent = "Time: " + timeCounter;
 // set the styling of the displayed div's
 highScoreEl.setAttribute("style", "color:#177648");
 mainQuestionEl.setAttribute("style", "width:400px; margin: 0 auto; font-style:bold; font-size:30px;");
-choiceEl.setAttribute("style", "width:400px; margin: 15px auto 0;");
+// choiceEl.setAttribute("style", "width:400px; margin: 15px auto 0;");
 resultEl.setAttribute("style", "margin:30px auto 0; border-top: 2px solid #75170b; width:400px; color: #777777; font-size:25px; font-style: italic;");
 
 // create a function that will hold the question object and return the array of objects
@@ -64,8 +64,67 @@ var questionsAndAnswers = function (){
     
     // return the array
     return quiz;
-    
 }
+
+var showQuesAnswer = function(){
+
+    var quizQA = questionsAndAnswers();
+    var question = Math.floor(Math.random() * quizQA.length);
+    console.log(question);
+
+    var seenQuestion = [];
+
+    var choicesEl = document.createElement("ul");
+    
+    var li1 = document.createElement("li");
+    var li2 = document.createElement("li");
+    var li3 = document.createElement("li");
+    var li4 = document.createElement("li");
+    li1.className="choicesList";
+    li2.className="choicesList";
+    li3.className="choicesList";
+    li4.className="choicesList";
+
+    li1.textContent = quizQA[question].answer1;
+    li2.textContent = quizQA[question].answer2;
+    li3.textContent = quizQA[question].answer3;
+    li4.textContent = quizQA[question].answer4;
+
+    li1.setAttribute("style", "color: #ffffff; background-color:#2d2275; padding:10px; margin: 10px 0; border-radius: 10px; font-size: 20px;");
+    li2.setAttribute("style", "color: #ffffff; background-color:#2d2275; padding:10px; margin: 10px 0; border-radius: 10px; font-size: 20px;");
+    li3.setAttribute("style", "color: #ffffff; background-color:#2d2275; padding:10px; margin: 10px 0; border-radius: 10px; font-size: 20px;");
+    li4.setAttribute("style", "color: #ffffff; background-color:#2d2275; padding:10px; margin: 10px 0; border-radius: 10px; font-size: 20px;");
+
+    choicesEl.append(li1, li2, li3, li4);
+    choiceEl.appendChild(choicesEl);
+
+    function makeChoice(event){
+        console.log(event.target)
+    }
+
+    if(!seenQuestion.includes(question)){
+        mainQuestionEl.textContent = quizQA[question].question;
+        seenQuestion.push(question);
+    }
+
+    choicesEl.addEventListener("click", makeChoice);
+
+};
+
+// function to start the quiz
+var startQuiz = function(){
+
+    //Hide the high score element
+    highScoreEl.style.display="none";
+    resultEl.style.display="block";
+
+    // mainQuestionEl.textContent = "Main questions go here";
+    choiceEl.setAttribute("style", "width:300px; margin: 15px auto 0;");
+    // choiceEl.textContent = "Choices go here";
+
+    showQuesAnswer();
+
+};
 
 // create a function to launch when the user opens the application and clicks the start button
 var openQuiz = function(){
@@ -87,7 +146,27 @@ var openQuiz = function(){
     resultEl.style.display="none";
 
     startButtonEl.addEventListener("click", function(){
-        console.log("let's start!!!");
+        
+        var timeRemaining = 15;
+        var countDown = setInterval(function () {
+    
+            if (timeRemaining > 9){
+                quizTimeEl.textContent = "Time: 00:" + timeRemaining;
+                timeRemaining--;
+                timeCounter = timeRemaining;
+            }  else if (timeRemaining < 10 && timeRemaining >= 1){
+                quizTimeEl.textContent = "Time: 00:0" + timeRemaining;
+                timeRemaining--;
+                timeCounter = timeRemaining;
+            }  else if (timeRemaining === 0) {
+                clearInterval(countDown);
+                quizTimeEl.style.display="none";
+                timeRemaining=59;
+            }
+        }, 1000);
+
+        startQuiz();
+        choiceEl.removeChild(startEl);
     });
 
 };
