@@ -158,7 +158,7 @@ var checkQA = function (question) {
                         newTime--;
                         timeCounter = newTime;
                     } else if (newTime <= 0) {
-                        clearInterval(countDown);
+                        clearInterval(timer);
                         quizTimeEl.style.display = "none";
                         timeCounter = newTime;
                     }
