@@ -19,8 +19,6 @@ quizResultEl.appendChild(resultEl);
 // variable to hold the time  
 var timeCounter = "";
 
-var minusTime = false;
-
 // set text to the displayed elements
 highScoreEl.textContent = "View High Scores";
 quizTimeEl.textContent = "Time: " + timeCounter;
@@ -34,9 +32,76 @@ resultEl.setAttribute("style", "margin:30px auto 0; border-top: 2px solid #75170
 
 // variable to hold the time
 var timer;
-
+// varaible to hold the user's score
 var score = 0;
 
+// create an array to hold all of the high scores
+var allHighScore = [];
+
+// create an object to hold the user's name and score
+var userNameScore = {name:"", score:""};
+
+// function to show the high scores
+var showAllScores = function(){
+    // create elements
+    var scoreTitleEL = document.createElement("div");
+    var scoreList = document.createElement("div");
+    var scoreLi = document.createElement("li");
+    var startOverBtn = document.createElement("button");
+    var clearScoreBtn = document.createElement("button")
+
+    // create classes for styling
+    scoreList.className = "scoreList"
+    startOverBtn.className = "submitBtn";
+    clearScoreBtn.className = "submitBtn";
+
+    // append the children to the parent elements
+    mainQuestionEl.appendChild(scoreTitleEL);
+    mainQuestionEl.appendChild(scoreList);
+    mainQuestionEl.appendChild(startOverBtn);
+    mainQuestionEl.appendChild(clearScoreBtn);
+
+    // set the text content of each element
+    scoreTitleEL.textContent = "High Scores";
+    startOverBtn.textContent = "Start Over";
+    clearScoreBtn.textContent = "Clear All Scores";
+
+    // get the info from local storage
+    var users = localStorage.getItem("highScores");
+    var allScores = JSON.parse(users);
+
+    //add the score from the local storage
+    scoreList.textContent = allScores.name + " - " + allScores.score;
+
+    var scoreCleared = false;
+    // start the quiz over by clearing out the child nodes
+    startOverBtn.addEventListener("click", function(){
+        if (scoreCleared){
+            mainQuestionEl.removeChild(scoreTitleEL);
+            mainQuestionEl.removeChild(startOverBtn);
+            mainQuestionEl.removeChild(clearScoreBtn);
+            // document.location.reload();
+        } else {
+            mainQuestionEl.removeChild(scoreTitleEL);
+            mainQuestionEl.removeChild(scoreList);
+            mainQuestionEl.removeChild(startOverBtn);
+            mainQuestionEl.removeChild(clearScoreBtn);
+        }
+
+        // reload the page to start over
+        document.location.reload();
+    });
+
+    // clear the local stoarage
+    clearScoreBtn.addEventListener("click", function(){
+        mainQuestionEl.removeChild(scoreList);
+        scoreCleared = true
+        localStorage.clear();
+    });
+
+}
+
+// function to show the user's score and allow input to save
 var showScore = function (){
     mainQuestionEl.textContent = "";
     choiceEl.style.display = "none";
@@ -45,27 +110,41 @@ var showScore = function (){
     var scoreEl = document.createElement("div");
     var initialsEl = document.createElement("div");
     var initialsFormEl = document.createElement("form");
-    var initialsBtn = document.createElement("button");
+    var initialsBtnEl = document.createElement("button");
     var initialsInput = document.createElement("input");
     initialsInput.type = "text";
     initialsInput.name = "initials-text";
     initialsFormEl.appendChild(initialsInput);
-    initialsBtn.textContent = "Submit";
-    initialsBtn.className = "submitBtn";
+    initialsBtnEl.textContent = "Submit";
+    initialsBtnEl.className = "submitBtn";
 
     mainQuestionEl.appendChild(finishedEl);
     mainQuestionEl.appendChild(scoreEl);
     mainQuestionEl.appendChild(initialsEl);
 
     initialsEl.setAttribute("style", "display:flex justify-content:center;");
-    initialsEl.textContent = "Enter your initials: ";
+    initialsEl.textContent = "Enter your initials to save your score: ";
     initialsEl.appendChild(initialsFormEl);
-    initialsEl.appendChild(initialsBtn);
+    initialsEl.appendChild(initialsBtnEl);
 
     scoreEl.setAttribute("style", "font-style:italic;");
 
-    finishedEl.textContent = "Quiz Complete";
+    finishedEl.textContent = "Quiz Complete!!";
     scoreEl.textContent = "Your Score is " + score;
+
+    // function to save the user's score to local storage
+    initialsBtnEl.addEventListener("click", function(){
+        userNameScore.name = initialsInput.value;
+        userNameScore.score = score;
+        allHighScore.push(userNameScore);
+        localStorage.setItem("highScores", JSON.stringify(userNameScore));
+        mainQuestionEl.removeChild(finishedEl);
+        mainQuestionEl.removeChild(scoreEl);
+        mainQuestionEl.removeChild(initialsEl);
+
+        // call the function to show all the scores
+        showAllScores();
+    });
 
 }
 
@@ -121,11 +200,15 @@ var randomQuestion = function () {
 // function to check the the question isn't repeating and show a new one
 var checkQA = function (question) {
 
-    if (!seenQuestion.includes(question)) {
+        if (seenQuestion.length === 10) {
+
+            showScore();
+            clearInterval(timer);
+            quizTimeEl.style.display = "none";
+
+        } else if (!seenQuestion.includes(question)) {
         mainQuestionEl.textContent = quizQA[question].question;
         seenQuestion.push(question);
-        // console.log(question + "false");
-        // console.log(seenQuestion);
 
         // create an unordered list element to hold the list elements
         var choicesEl = document.createElement("ul");
@@ -169,7 +252,6 @@ var checkQA = function (question) {
                 choicesEl.removeChild(li4);
                 choiceEl.removeChild(choicesEl);
                 score = score + 10;
-                console.log("the new score is: " + score)
                 showQuesAnswer();
 
             } else {
@@ -181,7 +263,7 @@ var checkQA = function (question) {
                 choiceEl.removeChild(choicesEl);
                 var newTime = timeCounter - 10;
                 score = score - 3;
-                console.log("the new score is: " + score);
+            
                 // clear the timer and set the new time
                 clearInterval(timer);
                 timer = setInterval(function () {
@@ -190,7 +272,6 @@ var checkQA = function (question) {
                         quizTimeEl.textContent = "Time: 00:" + newTime;
                         newTime--;
                         timeCounter = newTime;
-                        console.log("time is ticking")
                     } else if (newTime < 10 && newTime >= 1) {
                         quizTimeEl.textContent = "Time: 00:0" + newTime;
                         newTime--;
@@ -266,13 +347,27 @@ var openQuiz = function () {
     choiceEl.appendChild(startEl);
     resultEl.style.display = "none";
 
+    // add event listener to view the scores. if there is something go to high score page if not return
+    highScoreEl.addEventListener("click", function(){
+       
+        if (localStorage.getItem("highScores") === null){
+            console.log("user name isn't there")
+            return;
+        
+        } else{
+            
+            topInfoEl.style.display = "none";
+            startButtonEl.style.display = "none";
+            mainQuestionEl.textContent = "";
+    
+            showAllScores();
+        }
+    });
+
     startButtonEl.addEventListener("click", function () {
 
         // var timeRemaining = 59;
         var time = 59;
-
-        // call function to start the timer
-        // timeTracker(timeRemaining, false);
 
         // setTime(timeRemaining);
         timer = setInterval(function () {
@@ -281,7 +376,6 @@ var openQuiz = function () {
                 quizTimeEl.textContent = "Time: 00:" + time;
                 time--;
                 timeCounter = time;
-                console.log("time is ticking")
             } else if (time <= 9 && time >= 1) {
                 quizTimeEl.textContent = "Time: 00:0" + time;
                 time--;
@@ -300,4 +394,5 @@ var openQuiz = function () {
 
 };
 
+// open the quiz
 openQuiz();
