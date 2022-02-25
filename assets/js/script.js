@@ -35,6 +35,40 @@ resultEl.setAttribute("style", "margin:30px auto 0; border-top: 2px solid #75170
 // variable to hold the time
 var timer;
 
+var score = 0;
+
+var showScore = function (){
+    mainQuestionEl.textContent = "";
+    choiceEl.style.display = "none";
+    resultEl.style.display = "none";
+    var finishedEl = document.createElement("div");
+    var scoreEl = document.createElement("div");
+    var initialsEl = document.createElement("div");
+    var initialsFormEl = document.createElement("form");
+    var initialsBtn = document.createElement("button");
+    var initialsInput = document.createElement("input");
+    initialsInput.type = "text";
+    initialsInput.name = "initials-text";
+    initialsFormEl.appendChild(initialsInput);
+    initialsBtn.textContent = "Submit";
+    initialsBtn.className = "submitBtn";
+
+    mainQuestionEl.appendChild(finishedEl);
+    mainQuestionEl.appendChild(scoreEl);
+    mainQuestionEl.appendChild(initialsEl);
+
+    initialsEl.setAttribute("style", "display:flex justify-content:center;");
+    initialsEl.textContent = "Enter your initials: ";
+    initialsEl.appendChild(initialsFormEl);
+    initialsEl.appendChild(initialsBtn);
+
+    scoreEl.setAttribute("style", "font-style:italic;");
+
+    finishedEl.textContent = "Quiz Complete";
+    scoreEl.textContent = "Your Score is " + score;
+
+}
+
 // create a function that will hold the question object and return the array of objects
 var questionsAndAnswers = function () {
     // create a class to hold the objects needed
@@ -134,6 +168,8 @@ var checkQA = function (question) {
                 choicesEl.removeChild(li3);
                 choicesEl.removeChild(li4);
                 choiceEl.removeChild(choicesEl);
+                score = score + 10;
+                console.log("the new score is: " + score)
                 showQuesAnswer();
 
             } else {
@@ -144,6 +180,8 @@ var checkQA = function (question) {
                 choicesEl.removeChild(li4);
                 choiceEl.removeChild(choicesEl);
                 var newTime = timeCounter - 10;
+                score = score - 3;
+                console.log("the new score is: " + score);
                 // clear the timer and set the new time
                 clearInterval(timer);
                 timer = setInterval(function () {
@@ -161,6 +199,7 @@ var checkQA = function (question) {
                         clearInterval(timer);
                         quizTimeEl.style.display = "none";
                         timeCounter = newTime;
+                        showScore();
                     }
                 }, 1000);
                 showQuesAnswer();
@@ -243,14 +282,15 @@ var openQuiz = function () {
                 time--;
                 timeCounter = time;
                 console.log("time is ticking")
-            } else if (time < 10 && time >= 1 && isMinus) {
+            } else if (time <= 9 && time >= 1) {
                 quizTimeEl.textContent = "Time: 00:0" + time;
                 time--;
                 timeCounter = time;
             } else if (time === 0) {
-                clearInterval(countDown);
+                clearInterval(timer);
                 quizTimeEl.style.display = "none";
                 timeCounter = time;
+                showScore();
             }
         }, 1000);
 

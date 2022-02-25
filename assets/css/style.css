@@ -46,3 +46,20 @@
 .choicesList:hover{
     background-color: #177648;
 }
+
+.form{
+    height: 100px;
+}
+
+.submitBtn{
+    outline: none;
+    border: none;
+    background: var(--tertiary);
+    color: #ffffff;
+    border-radius: 6px;
+    margin: 0 auto;
+    padding: 15px 30px;
+    font-size: 15px;
+    margin-top: 10px;
+
+}
